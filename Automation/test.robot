@@ -21,6 +21,13 @@ Automation_Task_1
     Get Closed Titles and Post with Highest Number of views
     Get Topics and Information about Category
 
+Automation_Task_2
+    [Tags]  test2
+    Initial steps task2
+    Go to second page
+    Get information about Second and Third posts
+    Scroll down
+    Get School address
 
 *** Keywords ***
 Initial steps task1
@@ -92,6 +99,42 @@ Get Topics and Information about Category
     Log to Console  Number of Pet Topics: ${number_of_pets_topics}
     Log to Console  Number of Topics without category: ${number_of_topics_without_category}
 
+Initial steps task2
+    Open Browser    https://www.cesar.school/     chrome
+    Maximize Browser Window
+    Sleep   3
+    Click Link  //*[@id="menu-item-8945"]/a
+
+Go to second page
+    Click Link  //*[@id="primary"]/div/nav/div/a[3]
+
+Get information about Second and Third posts
+    @{get_parent_post_elements}  Get WebElements     xpath://*[contains(@id,'post')]
+    ${remove_first_post}   Remove From List    ${get_parent_post_elements}   0
+    ${index}    Set Variable    ${0}
+    Log to Console  ${\n}
+    FOR     ${a}    IN      @{get_parent_post_elements}
+        ${index}     Evaluate    ${index}+1
+        ${id_parent}=   Get Element Attribute  ${a}  id
+        ${second_post_title}=   Run Keyword If  ${index == 1}   Get Text    xpath://*[@id="${id_parent}"]/div/div/header/h2/a
+        ${month_second_post_title}=   Run Keyword If  ${index == 1}     Get Text    xpath://*[@id="${id_parent}"]/div/div/div[1]/a/div/span/time[1]/span[1]
+        ${day_second_post_title}=   Run Keyword If  ${index == 1}   Get Text  xpath://*[@id="${id_parent}"]/div/div/div[1]/a/div/span/time[1]/span[2]
+        ${year_second_post_title}=   Run Keyword If  ${index == 1}  Get Text   xpath://*[@id="${id_parent}"]/div/div/div[1]/a/div/span/time[1]/span[3]
+        ${third_post_title}=    Run Keyword If  ${index == 2}   Get Text    xpath://*[@id="${id_parent}"]/div/div/header/h2/a
+        ${author_post_title}=   Run Keyword If  ${index == 2}   Get Text    xpath://*[@id="${id_parent}"]/div/div/header/div/span[2]/a/span
+        Run Keyword If  ${index == 2}   Click Link      //*[@id="${id_parent}"]/div/div/header/h2/a
+        Run Keyword If  ${index == 1}   Log to Console  Título do segundo post: ${second_post_title}
+        Run Keyword If  ${index == 1}   Log to Console  Data do segundo post: ${day_second_post_title}/${month_second_post_title}/${year_second_post_title}
+        Run Keyword If  ${index == 2}   Log to Console  Título do terceito post: ${third_post_title}
+        Run Keyword If  ${index == 2}   Log to Console  Autor do terceito post: ${author_post_title}
+        IF  ${index == 2}   BREAK
+    END
+
 Scroll down
     Execute JavaScript    window.scrollTo(0, document.body.scrollHeight)
+
+Get School address
+    ${where}     Get WebElements      xpath://*[@class="onde"]/p
+    ${address_school}=   Get Text  ${where}
+    Log to Console  Endereço do School: ${address_school}
 
